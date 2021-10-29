@@ -252,10 +252,6 @@ player = entities.Player()
 hp_check()
 left, right, pause, play = draw_combat_btns()
 
-
-
-
-
 running = True
 while running:
 
