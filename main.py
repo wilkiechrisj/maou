@@ -5,6 +5,8 @@ import entities
 from buttons import Button
 from random import randint, choices
 from copy import deepcopy
+import micros
+from time import sleep
 
 GAME = 'MAOU'
 WINDOW = (1280, 720)
@@ -24,7 +26,7 @@ ENEMY_THREE = (700, 65, 100, 200)
 BOSS = (700, 65, 400, 200)
 PLAYER = (200, 65, 100, 200)
 
-ENEMY_UNITS = (entities.Wolf(), entities.Slime(), entities.Zombie())
+ENEMY_UNITS = (entities.Wolf(), entities.Rat(), entities.Zombie())
 ENEMY_NUM = 3
 
 BOSS_UNITS = (entities.Dragon(), entities.Dragon())
@@ -69,7 +71,7 @@ def draw_enemies(enemies):
 
         count += 1
 
-        if unit.name == 'Slime':
+        if unit.name == 'Rat':
             pygame.draw.rect(screen, YELLOW, pygame.Rect(shape[count]))
             pygame.display.flip()
         if unit.name == 'Wolf':
@@ -157,8 +159,6 @@ def draw_combat_btns():
     return left_btn, right_btn, pause_btn, play_btn
 
 
-
-
 def damage(units):
 
     for enemy in units:
@@ -225,11 +225,24 @@ def game_over():
     pygame.display.flip()
 
 
-def wiki_scrape(units, language):
+def wiki_scrape(units):
+
+    names = []
+
+    for unit in units:
+        if unit.name not in names:
+            names.append(unit.name)
+
     Tk().wm_withdraw()
-    messagebox.showinfo('Enemy Info', "This is where wiki scrape info on what enemies you're facing will go.\n"
-                                      "Translation of all this text will be provided by another microservice. \n"
-                                      "You will be able to pick your language at the home page.")
+
+    res = messagebox.askquestion('Language', '¿Necesitas en Español?')
+    if res == 'yes':
+        data = micros.wiki_scrape_translate(names, 'es')
+    else:
+        data = micros.wiki_scrape_translate(names)
+
+    messagebox.showinfo('ENEMY INFO', data)
+
 
 # ---- GAME STARTS HERE ---- #
 pygame.init()
@@ -273,16 +286,20 @@ while running:
             pos = pygame.mouse.get_pos()
             if left.over(pos):
                 enemies = enter_room(left_room)
+                hp_check(enemies)
+                sleep(1)
                 generated = False
             if right.over(pos):
                 enemies = enter_room(right_room)
+                hp_check(enemies)
+                sleep(1)
                 generated = False
         if event.type == pygame.MOUSEBUTTONDOWN and battle:
             pos = pygame.mouse.get_pos()
             if pause.over(pos):
                 print('PAUSE')
             if play.over(pos):
-                wiki_scrape(enemies, 'english')
+                wiki_scrape(enemies)
         if enemies:
             battle = True
         if event.type == pygame.QUIT:

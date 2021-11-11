@@ -39,7 +39,7 @@ class Player:
 
 
 @dataclass
-class Slime:
+class Rat:
 
     name: str
     attack: int
@@ -49,7 +49,7 @@ class Slime:
     value: int
 
     def __init__(self):
-        self.name = 'Slime'
+        self.name = 'Rat'
         self.rep = YELLOW
         self.attack = 0
         self.defense = 0
