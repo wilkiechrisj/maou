@@ -26,7 +26,7 @@ class Player:
 
     def __init__(self):
         self.name = 'Maou'
-        self.rep = BLUE
+        self.type = 'PLAYER'
         self.attack = 2
         self.defense = 0
         self.speed = 1
@@ -35,6 +35,7 @@ class Player:
         self.debuffs = []
         self.buffs = []
         self.score = 0
+        self.gold = 0
         self.rooms = 1
 
 
@@ -50,7 +51,7 @@ class Rat:
 
     def __init__(self):
         self.name = 'Rat'
-        self.rep = YELLOW
+        self.type = 'ENEMY'
         self.attack = 0
         self.defense = 0
         self.speed = 1
@@ -75,7 +76,7 @@ class Zombie:
 
     def __init__(self):
         self.name = 'Zombie'
-        self.rep = GREEN
+        self.type = 'ENEMY'
         self.attack = 1
         self.defense = 0
         self.speed = 1
@@ -101,7 +102,7 @@ class Wolf:
 
     def __init__(self):
         self.name = 'Wolf'
-        self.rep = BROWN
+        self.type = 'ENEMY'
         self.attack = 1
         self.defense = 1
         self.speed = 1
@@ -127,7 +128,7 @@ class Dragon:
 
     def __init__(self):
         self.name = 'Dragon'
-        self.rep = BLACK
+        self.type = 'BOSS'
         self.attack = 3
         self.defense = 1
         self.speed = 1
