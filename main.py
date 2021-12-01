@@ -286,12 +286,14 @@ while running:
             pos = pygame.mouse.get_pos()
             if left.over(pos):
                 enemies = enter_room(left_room)
-                hp_check(enemies)
+                if enemies:
+                    hp_check(enemies)
                 sleep(1)
                 generated = False
             if right.over(pos):
                 enemies = enter_room(right_room)
-                hp_check(enemies)
+                if enemies:
+                    hp_check(enemies)
                 sleep(1)
                 generated = False
         if event.type == pygame.MOUSEBUTTONDOWN and battle:
