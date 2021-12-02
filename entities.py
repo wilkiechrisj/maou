@@ -35,7 +35,7 @@ class Player:
         self.debuffs = []
         self.buffs = []
         self.score = 0
-        self.gold = 444
+        self.gold = 0
         self.rooms = 1
 
 
