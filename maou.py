@@ -161,6 +161,7 @@ class MaouGame:
 
     def draw_shop(self, refresh=False):
 
+        pygame.draw.rect(self.screen, (192, 192, 192), pygame.Rect(900, 320, 300, 311))
         if not refresh:
             self.inventory = []
             count = 4
@@ -193,8 +194,6 @@ class MaouGame:
             self.screen.blit(text, desc_coords[index])
             self.screen.blit(name, name_coords[index])
 
-        pygame.draw.rect(self.screen, (192, 192, 192), pygame.Rect(990, 607, 150, 23))
-        pygame.display.flip()
         gold = self.font.render('GOLD: ' + str(self.player.gold), False, (0, 0, 0))
         self.screen.blit(gold, (990, 600))
         self.font = pygame.font.SysFont('Comic Sans MS', 28)
