@@ -204,6 +204,7 @@ class MaouGame:
         coords = [(490, 325), (675, 325), (490, 500), (675, 500)]
 
         pygame.draw.rect(self.screen, (192, 192, 192), pygame.Rect(475, 305, 325, 150))
+        pygame.draw.rect(self.screen, (192, 192, 192), pygame.Rect(475, 480, 325, 150))
 
         for index in range(len(self.spells)):
             if self.spells[index] == 'DMG':
