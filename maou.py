@@ -388,3 +388,11 @@ class MaouGame:
             data = micros.wiki_scrape_translate(names)
 
         messagebox.showinfo('ENEMY INFO', data)
+
+    def draw_tutorial(self):
+
+        with open('readme.txt', 'r') as file:
+            data = file.read()
+
+        Tk().wm_withdraw()
+        messagebox.showinfo('Tutorial', data)
