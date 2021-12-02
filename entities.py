@@ -141,7 +141,7 @@ class Dragon:
         self.turn += 1
 
         if self.turn % 2 == 0:
-            return self.attack
+            return self.attack - 1
 
 
 if __name__ == "__main__":

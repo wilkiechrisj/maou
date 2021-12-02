@@ -24,20 +24,20 @@ class MaouGame:
         }
 
         self.buttons = {
-            'left': Button(65, 640, 111, 56),
-            'right': Button(275, 640, 111, 56),
-            'pause': Button(890, 640, 111, 56),
-            'play': Button(1100, 640, 111, 56),
-            'info': None,
-            'wiki': None,
-            'buy_1': None,
-            'buy_2': None,
-            'buy_3': None,
-            'buy_4': None,
-            'cast_1': None,
-            'cast_2': None,
-            'cast_3': None,
-            'cast_4': None
+            'left': Button(65, 650, 111, 56),
+            'right': Button(275, 650, 111, 56),
+            'pause': Button(890, 650, 111, 56),
+            'play': Button(1100, 650, 111, 56),
+            'info': Button(475, 650, 111, 56),
+            'wiki': Button(690, 650, 111, 56),
+            'buy_1': Button(900, 325, 111, 56),
+            'buy_2': Button(900, 400, 111, 56),
+            'buy_3': Button(900, 475, 111, 56),
+            'buy_4': Button(900, 550, 111, 56),
+            'cast_1': Button(490, 325, 111, 56),
+            'cast_2': Button(675, 325, 111, 56),
+            'cast_3': Button(490, 500, 111, 56),
+            'cast_4': Button(675, 500, 111, 56)
         }
 
         self.name = 'MAOU'
@@ -51,40 +51,45 @@ class MaouGame:
         self.battle = False
         self.camp = True
         self.shop = False
+        self.pause = False
 
         self.player = entities.Player()
+        self.spells = ['HEAL', 'DMG']
         self.enemies = []
 
         self.rooms = ['CAMP', 'SHOP', 'MINION', 'BOSS']
         self.room_weight = [25, 25, 40, 10]
         self.active_rooms = [None, None]
 
+        self.score = 0
+        self.room_count = 0
+
         self.enemy_pool = [entities.Wolf(), entities.Rat(), entities.Zombie()]
         self.boss_pool = [entities.Dragon()]
+        self.spell_pool = ['HEAL', 'DMG']
+        self.inventory = []
 
         self.music_mp4 = 'resources/bensound-epic.mp3'
-
         self.icon_img = pygame.image.load('resources/icon.png')
         self.bg_img = pygame.image.load('resources/background.png')
         self.minion_img = pygame.image.load('resources/vile-fluid.png')
         self.boss_img = pygame.image.load('resources/brute.png')
         self.camp_img = pygame.image.load('resources/camping-tent.png')
-        self.shop_img = pygame.image.load('resources/play.png')  # HELP
-
+        self.shop_img = pygame.image.load('resources/shop.png')
         self.player_img = pygame.image.load('resources/maou.png')
         self.rat_img = pygame.image.load('resources/rat.png')
         self.zombie_img = pygame.image.load('resources/zombie.png')
         self.wolf_img = pygame.image.load('resources/wolf.png')
         self.dragon_img = pygame.image.load('resources/dragon.png')
-
         self.left_btn = pygame.image.load('resources/left.png')
         self.right_btn = pygame.image.load('resources/right.png')
         self.pause_btn = pygame.image.load('resources/pause.png')
         self.play_btn = pygame.image.load('resources/play.png')
-        self.info_btn = pygame.image.load('resources/play.png')  # HELP
-        self.wiki_btn = pygame.image.load('resources/play.png')  # HELP
-        self.dmg_spell_btn = pygame.image.load('resources/play.png')  # HELP
-        self.heal_spell_btn = pygame.image.load('resources/play.png')  # HELP
+        self.info_btn = pygame.image.load('resources/help.png')
+        self.wiki_btn = pygame.image.load('resources/wiki.png')
+        self.buy_btn = pygame.image.load('resources/buy.png')
+        self.dmg_spell_btn = pygame.image.load('resources/agi.png')
+        self.heal_spell_btn = pygame.image.load('resources/dia.png')
 
         self.img_lib = {
             'Maou': self.player_img,
@@ -94,6 +99,9 @@ class MaouGame:
             'Dragon': self.dragon_img
         }
 
+        self.start_game()
+
+    def start_game(self):
         pygame.display.set_caption(self.name)
         pygame.mixer.music.load(self.music_mp4)
         pygame.display.set_icon(self.icon_img)
@@ -101,6 +109,7 @@ class MaouGame:
         self.draw_background(self.bg_img)
         self.draw_buttons()
         self.draw_spells()
+        self.draw_units()
         self.hp_check()
 
     def draw_background(self, img):
@@ -142,19 +151,67 @@ class MaouGame:
 
     def draw_buttons(self):
 
-        self.screen.blit(self.left_btn, (65, 640))
-        self.screen.blit(self.right_btn, (275, 640))
-        self.screen.blit(self.pause_btn, (890, 640))
-        self.screen.blit(self.play_btn, (1100, 640))
-        self.screen.blit(self.info_btn, (0, 0))  # HELP
-        self.screen.blit(self.wiki_btn, (0, 0))  # HELP
+        self.screen.blit(self.left_btn, (65, 650))
+        self.screen.blit(self.right_btn, (275, 650))
+        self.screen.blit(self.pause_btn, (890, 650))
+        self.screen.blit(self.play_btn, (1100, 650))
+        self.screen.blit(self.info_btn, (475, 650))
+        self.screen.blit(self.wiki_btn, (690, 650))
         pygame.display.flip()
 
-    def draw_shop(self):
-        pass
+    def draw_shop(self, refresh=False):
+
+        if not refresh:
+            self.inventory = []
+            count = 4
+        else:
+            count = len(self.inventory)
+            pygame.draw.rect(self.screen, (192, 192, 192), pygame.Rect(900, 320, 300, 300))
+
+        butn_coords = [(900, 325), (900, 400), (900, 475), (900, 550)]
+        desc_coords = [(1020, 358), (1020, 433), (1020, 508), (1020, 583)]
+        name_coords = [(1020, 325), (1020, 400), (1020, 475), (1020, 550)]
+
+        for index in range(count):
+
+            if not refresh:
+                self.inventory.append(self.spell_pool[randint(0, len(self.spell_pool) - 1)])
+
+            if self.inventory[index] == 'HEAL':
+                self.screen.blit(self.heal_spell_btn, butn_coords[index])
+                self.font = pygame.font.SysFont('Comic Sans MS', 16)
+                text = self.font.render('Heal 10 HP', False, (0, 0, 0))
+                self.font = pygame.font.SysFont('Comic Sans MS', 26)
+                name = self.font.render('DIA - 7 GOLD', False, (0, 0, 0))
+
+            if self.inventory[index] == 'DMG':
+                self.screen.blit(self.dmg_spell_btn, butn_coords[index])
+                self.font = pygame.font.SysFont('Comic Sans MS', 16)
+                text = self.font.render('5 DMG to random enemy', False, (0, 0, 0))
+                self.font = pygame.font.SysFont('Comic Sans MS', 26)
+                name = self.font.render('AGI - 5 GOLD', False, (0, 0, 0))
+
+            self.screen.blit(text, desc_coords[index])
+            self.screen.blit(name, name_coords[index])
+
+        gold = self.font.render('GOLD: ' + str(self.player.gold), False, (0, 0, 0))
+        self.screen.blit(gold, (990, 600))
+        self.font = pygame.font.SysFont('Comic Sans MS', 28)
+        pygame.display.flip()
 
     def draw_spells(self):
-        pass
+
+        coords = [(490, 325), (675, 325), (490, 500), (675, 500)]
+
+        pygame.draw.rect(self.screen, (192, 192, 192), pygame.Rect(475, 305, 325, 150))
+
+        for index in range(len(self.spells)):
+            if self.spells[index] == 'DMG':
+                self.screen.blit(self.dmg_spell_btn, coords[index])
+            if self.spells[index] == 'HEAL':
+                self.screen.blit(self.heal_spell_btn, coords[index])
+
+        pygame.display.flip()
 
     def generate_enemies(self, boss):
 
@@ -179,6 +236,10 @@ class MaouGame:
 
         self.draw_background(self.bg_img)
         self.draw_buttons()
+        self.draw_units()
+        self.draw_spells()
+
+        self.room_count += 1
 
         if room == 'CAMP':
             self.enter_camp()
@@ -206,12 +267,39 @@ class MaouGame:
         self.camp = False
         self.shop = True
         self.battle = False
+        self.draw_shop()
 
     def enter_battle(self):
 
         self.camp = False
         self.shop = False
         self.battle = True
+
+    def cast_spell(self, index):
+
+        if self.spells[index] == 'HEAL':
+            self.player.cur_health += 10
+            if self.player.cur_health > 50:
+                self.player.cur_health = 50
+
+        if self.spells[index] == 'DMG':
+            target = randint(0, len(self.enemies) - 1)
+            while self.enemies[target].health == 0:
+                target = randint(0, len(self.enemies) - 1)
+            self.enemies[target].health -= 5
+            if self.enemies[target].health < 0:
+                self.enemies[target].health = 0
+
+        del self.spells[index]
+        self.draw_spells()
+
+    def buy_spell(self, index):
+
+        spell = self.inventory[index]
+        del self.inventory[index]
+        self.spells.append(spell)
+        self.draw_shop(True)
+        self.draw_spells()
 
     def damage_calc(self):
 
@@ -258,8 +346,14 @@ class MaouGame:
         if all(enemy.health <= 0 for enemy in self.enemies):
             self.battle = False
             for enemy in self.enemies:
-                self.player.score += enemy.value
+                self.score += enemy.value
                 self.player.gold += enemy.value
+
+            self.enemies = []
+            self.draw_background(self.bg_img)
+            self.draw_spells()
+            self.draw_units()
+            self.draw_buttons()
 
     def game_over(self):
 
@@ -272,7 +366,7 @@ class MaouGame:
         self.screen.blit(text, (440, 250))
 
         score = pygame.font.SysFont('Comic Sans MS', 70)
-        text = score.render('SCORE: ' + str(self.player.score), False, (255, 255, 0))
+        text = score.render('SCORE: ' + str(round((self.score / self.room_count) * 100)), False, (255, 255, 0))
         self.screen.blit(text, (470, 350))
 
         pygame.display.flip()

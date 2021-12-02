@@ -18,13 +18,18 @@ def main_loop():
             game.damage_calc()
             game.hp_check()
 
+        if not game.active:
+            return end_loop()
+
         if not game.battle and not game.active_rooms[0]:
             game.generate_rooms()
 
         for event in pygame.event.get():
 
+            pos = pygame.mouse.get_pos()
+
             if event.type == pygame.MOUSEBUTTONDOWN and not game.battle:
-                pos = pygame.mouse.get_pos()
+                print(pos)
                 if game.buttons['left'].over(pos):
                     game.enter_room(game.active_rooms[0])
                     if game.enemies:
@@ -37,17 +42,64 @@ def main_loop():
                     sleep(1)
 
             if event.type == pygame.MOUSEBUTTONDOWN and game.battle:
-                pos = pygame.mouse.get_pos()
                 if game.buttons['pause'].over(pos):
-                    print('PAUSE')
-                if game.buttons['play'].over(pos):
+                    game.pause = True
+                    pause_loop()
+                if game.buttons['wiki'].over(pos):
                     game.wiki_scrape()
+                if game.buttons['cast_1'].over(pos) and len(game.spells) > 0:
+                    game.cast_spell(0)
+                if game.buttons['cast_2'].over(pos) and len(game.spells) > 1:
+                    game.cast_spell(1)
+                if game.buttons['cast_3'].over(pos) and len(game.spells) > 2:
+                    game.cast_spell(2)
+                if game.buttons['cast_4'].over(pos) and len(game.spells) > 3:
+                    game.cast_spell(3)
+
+            if event.type == pygame.MOUSEBUTTONDOWN and game.shop and len(game.spells) < 4:
+                if game.buttons['buy_1'].over(pos):
+                    game.buy_spell(0)
+                if game.buttons['buy_2'].over(pos):
+                    game.buy_spell(1)
+                if game.buttons['buy_3'].over(pos):
+                    game.buy_spell(2)
+                if game.buttons['buy_4'].over(pos):
+                    game.buy_spell(3)
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if game.buttons['info'].over(pos):
+                    game.draw_tutorial()
+
             if event.type == pygame.QUIT:
-                game.active = False
+                return pygame.quit()
+
+    return pygame.quit()
+
+
+def pause_loop():
+
+    while game.pause:
+        for event in pygame.event.get():
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                if game.buttons['play'].over(pos):
+                    game.pause = False
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
 
 
 def end_loop():
-    pass
+    running = True
+    while running:
+        for event in pygame.event.get():
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                running = False
 
 
 if __name__ == '__main__':
