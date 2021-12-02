@@ -29,7 +29,6 @@ def main_loop():
             pos = pygame.mouse.get_pos()
 
             if event.type == pygame.MOUSEBUTTONDOWN and not game.battle:
-                print(pos)
                 if game.buttons['left'].over(pos):
                     game.enter_room(game.active_rooms[0])
                     if game.enemies:
